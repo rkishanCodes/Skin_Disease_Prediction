@@ -1,0 +1,3 @@
+backend/venv
+backend/best_model.keras
+backend/__pycache__
