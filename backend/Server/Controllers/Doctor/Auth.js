@@ -32,7 +32,7 @@ export const login = async(req,res) =>{
             return res.status(401).json({ error: 'Invalid email or password' });
         }
         const token = jwt.sign({id:doctor.id},process.env.JWT_SECRET_KEY,{expiresIn: "1h"})
-        res.json({ message: 'Doctor logged in successfully',doctor_username:doctor.username, token});
+        res.json({ message: 'Doctor logged in successfully',doctor_username:doctor.username, token,doctor_id:doctor.id});
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }

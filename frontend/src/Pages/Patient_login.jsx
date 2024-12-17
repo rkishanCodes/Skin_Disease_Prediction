@@ -19,7 +19,7 @@ const Patient_login = () => {
       localStorage.setItem("patient_token",response.data.token)
       localStorage.setItem("patient_name",response.data.patient_name)
       localStorage.setItem("patient_id",response.data.patient_id)
-      navigate("/dashboard")
+      navigate("/patient/dashboard")
     } catch (e) {
       const errorMessage = e.response?.data?.error || "Login failed. Please check your credentials.";
       setMessage(errorMessage);

@@ -6,9 +6,10 @@ import Doctor_login from './Pages/Doctor_login'
 import Doctor_register from './Pages/Doctor_register'
 import Dashboard from './Pages/Patient_Dashboard/Dashboard'
 import View_pescription from './Pages/Patient_Dashboard/View_pescription'
-
+import DoctorDashboard from "./Pages/Doctor_dashboard/DoctorDashboard"
 const App = () => {
   const Patient_token= localStorage.getItem('patient_token')
+  const doctor_token = localStorage.getItem('doctor_token')
   return (
     <>
       <Routes>
@@ -19,10 +20,17 @@ const App = () => {
           {
             Patient_token && (
               <>
-                <Route path="/dashboard" element={<Dashboard/>}/>
+                <Route path="/patient/dashboard" element={<Dashboard/>}/>
                 <Route path="/dashboard/viewpescription" element={<View_pescription/>}/>
               </>
             )
+          }
+          {doctor_token && (
+            <>
+              <Route path="/doctor/dashboard" element={<DoctorDashboard/>}/>
+            </>
+          )
+
           }
         </Routes> 
     </>
