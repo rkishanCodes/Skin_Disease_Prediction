@@ -41,7 +41,7 @@ export const patient_login = async (req, res) => {
       process.env.JWT_SECRET_KEY,
       { expiresIn: "7d" }
     );
-    res.json({ message: "Login successful", patient_name:patient.username ,token });
+    res.json({ message: "Login successful", patient_id:patient.id,patient_name:patient.username ,token });
   } catch (error) {
     res.status(500).json({ error: "An error occurred" });
   }

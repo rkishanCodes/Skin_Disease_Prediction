@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
-const disease = async (req, res) => {
+
+export const disease = async (req, res) => {
   const { patientId, name, description } = req.body;
 
   try {
@@ -17,4 +18,5 @@ const disease = async (req, res) => {
   }
 };
 
-export default disease;
+
+

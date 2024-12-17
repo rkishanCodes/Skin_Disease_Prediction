@@ -10,7 +10,7 @@ app.use(cors())
 app.use(json())
 const port = process.env.PORT || 8000;
 
-app.use("/api/v1/patinet/auth/",patient_router)
+app.use("/api/v1/patient/auth/",patient_router)
 app.use("/api/v1/patient/",patient_router)
 app.use("/api/v1/doctor/auth/",doctor_router)
 app.use("/api/v1/doctor/",doctor_router)
