@@ -2,19 +2,29 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const disease = async (req, res) => {
-  const { patientId, name, description } = req.body;
+  const { patientId, doctorId, diseaseName, diseaseDescription } = req.body;
 
   try {
     const disease = await prisma.disease.create({
       data: {
-        name,
-        description,
-        patientId,
+        name: diseaseName,
+        description: diseaseDescription,
+        patient: { connect: { id: patientId } },
       },
     });
-    res.status(201).json({ message: "Disease added successfully", disease });
+
+    await prisma.patient.update({
+      where: { id: patientId },
+      data: {
+        doctorId: doctorId,
+        consultationStatus: 'PENDING',
+      },
+    });
+
+    res.status(200).json({ message: 'Consultation request submitted.', disease });
   } catch (error) {
-    res.status(400).json({ error: "Failed to add disease" });
+    console.error(error);
+    res.status(500).json({ error: 'Failed to submit consultation.' });
   }
 };
 

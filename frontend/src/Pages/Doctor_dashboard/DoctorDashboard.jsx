@@ -1,125 +1,47 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
 import Navbar from "../../Components/Doctor/Navbar";
+import Box_comp from "../../Components/Doctor/Box_comp";
+import fetchStats from "../../Utils/Fetchstats";
 
 const DoctorDashboard = () => {
-  const [patients, setPatients] = useState([]);
-  const [selectedPatient, setSelectedPatient] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [prescription, setPrescription] = useState("");
+  const [stats,setstats] = useState({
+    completed:0,
+    pending:0
+  })
 
   useEffect(() => {
-    const fetchPatients = async () => {
+    const loadStats = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/v1/doctor/patients/");
-        setPatients(response.data.patients);
-      } catch (error) {
-        console.error("Error fetching patients:", error);
+        const data = await fetchStats(1);
+        setstats({
+          completed:data.consultedPatients,
+          pending:data.pendingConsults
+        });
+      } catch (err) {
+        console.error("Error fetching stats:", err);
       }
     };
 
-    fetchPatients();
+    loadStats();
   }, []);
-  
-  const handlePrescriptionSubmit = async () => {
-    if (!selectedPatient) {
-      alert("No patient selected.");
-      return;
-    }
-  
-    const doctorId = parseInt(localStorage.getItem("doctor_id"));
-    const diseaseId = selectedPatient.diseases[0]?.id;
-  
-    if (!doctorId) {
-      console.error("Missing doctorId");
-      return alert("Doctor ID is missing.");
-    }
-  
-    if (!diseaseId) {
-      console.error("Missing diseaseId");
-      return alert("Disease ID is missing.");
-    }
-  
-    const payload = { doctorId, diseaseId, prescription };
-  
-    try {
-      const response = await axios.post("http://localhost:8000/api/v1/doctor/prescribe", payload);
-  
-      if (response.status === 201) {
-        alert("Prescription added successfully!");
-        setIsModalOpen(false);
-        setPrescription("");
-      } else {
-        console.error("Unexpected response:", response);
-        alert("Unexpected server response.");
-      }
-    } catch (error) {
-      console.error("Error adding prescription:", error.response?.data || error.message);
-      alert("Failed to add prescription. Check the logs for details.");
-    }
-  };
-
   return (
-    <div className=" bg-[#fb6b68] min-h-screen">
-      <Navbar/>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-        {patients.map((patient) => (
-          <div
-            key={patient.id}
-            className="bg-white shadow-md rounded-lg p-6 border border-gray-200"
-          >
-            <h2 className="text-lg font-bold mb-2 text-[#fb6b68]">{patient.username}</h2>
-            <p className="text-sm mb-2">Age: {patient.age}</p>
-            <p className="text-sm font-bold">Diseases:</p>
-            <ul className="text-sm list-disc list-inside mb-4">
-              {patient.diseases.map((disease) => (
-                <li key={disease.id}>{disease.name}</li>
-              ))}
-            </ul>
-            <button
-              className="bg-[#fb6b68] text-white rounded-md mt-4 px-4 py-2 hover:bg-opacity-90"
-              onClick={() => {
-                setSelectedPatient(patient);
-                setIsModalOpen(true);
-              }}
-            >
-              Add Prescription
-            </button>
+    <div className="flex w-full ">
+      <Navbar />
+      <div className="w-[95vw] p-5 flex flex-col gap-5">
+        <div className="bg-gradient-to-l from-[#ff5184] via-[#ff5184] to-[#ff856b] w-full rounded-lg p-2 flex ">
+          <div className="w-36">
+            <img src="/doctor.png" alt="image" className="object-cover" />
           </div>
-        ))}
-      </div>
-
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white w-11/12 md:w-1/2 lg:w-1/3 p-6 rounded-md">
-            <h2 className="text-xl font-bold mb-4 text-[#fb6b68]">
-              Add Prescription for {selectedPatient?.username}
-            </h2>
-            <textarea
-              rows="6"
-              className="w-full border rounded-md p-2 mb-4 focus:outline-[#fb6b68]"
-              placeholder="Enter medicine details..."
-              value={prescription}
-              onChange={(e) => setPrescription(e.target.value)}
-            ></textarea>
-            <div className="flex justify-end gap-4">
-              <button
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
-                onClick={() => setIsModalOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-[#fb6b68] text-white px-4 py-2 rounded-md hover:bg-opacity-90"
-                onClick={handlePrescriptionSubmit}
-              >
-                Submit
-              </button>
-            </div>
+          <div className="w-1/2 h-full flex justify-center flex-col text-white">
+            <h1 className="text-3xl font-semibold">Hello! Doctor</h1>
+            <h1 className="text-3xl font-semibold">Ready to cure </h1>
           </div>
         </div>
-      )}
+        <div className="flex gap-4">
+          <Box_comp text={"Patient attended"} count={stats.completed} color={true} />
+          <Box_comp text={"Patient Pending"} count={stats.pending} color={false} />
+        </div>
+      </div>
     </div>
   );
 };

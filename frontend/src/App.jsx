@@ -7,6 +7,7 @@ import Doctor_register from "./Pages/Doctor_register";
 import Dashboard from "./Pages/Patient_Dashboard/Dashboard";
 import View_pescription from './Pages/Patient_Dashboard/View_pescription'
 import DoctorDashboard from "./Pages/Doctor_dashboard/DoctorDashboard"
+import GivePescription from "./Pages/Doctor_dashboard/GivePescription";
 const App = () => {
   const Patient_token = localStorage.getItem("patient_token");
   const doctor_token = localStorage.getItem('doctor_token')
@@ -28,6 +29,7 @@ const App = () => {
           {doctor_token && (
             <>
               <Route path="/doctor/dashboard" element={<DoctorDashboard/>}/>
+              <Route path="/doctor/pescription" element={<GivePescription/>}/>
             </>
           )
 

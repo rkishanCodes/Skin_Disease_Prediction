@@ -11,6 +11,7 @@ patient_router.post("/register",patient_register);
 patient_router.post("/login",patient_login)
 patient_router.post("/disease",disease) // /api/v1/patient/
 patient_router.get("/pescription/:patientId", pescription)
+
 patient_router.get("/details", verifyToken, getUserDetails);
 
 
