@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -8,6 +8,14 @@ const DoctorRegister = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+
+    console.log(localStorage.getItem("doctor_token"));
+    useEffect(() => {
+      if (localStorage.getItem("doctor_token")) {
+        navigate("/doctor/dashboard");
+      }
+    }, [navigate]);
 
   const handleRegister = async (e) => {
     e.preventDefault();
