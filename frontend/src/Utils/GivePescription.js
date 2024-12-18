@@ -1,11 +1,12 @@
 import axios from 'axios';
 
-const GivePrescription = async (doctorId, patientId, prescription) => {
+const givePrescription = async (doctorId, patientId, prescription, diseaseId) => {
   try {
     const requestData = {
       doctorId,
       patientId,
       prescription,
+      diseaseId,
     };
 
     const response = await axios.post('http://localhost:8000/api/v1/doctor/prescribe/', requestData);
@@ -16,4 +17,4 @@ const GivePrescription = async (doctorId, patientId, prescription) => {
   }
 };
 
-export default GivePrescription;
+export default givePrescription;

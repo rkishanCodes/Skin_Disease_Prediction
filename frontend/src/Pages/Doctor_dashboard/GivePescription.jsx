@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../Components/Doctor/Navbar";
 import getPatient from "../../Utils/GetPatients";
+import givePrescription from "../../Utils/GivePescription";
 
 const GivePrescription = () => {
   const [patients, setPatients] = useState([]);
   const [selectedDisease, setSelectedDisease] = useState(null);
+  const [selectedPatient, setSelectedPatient] = useState(null);
   const [prescription, setPrescription] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const doctor_id = localStorage.getItem("doctor_id");
+  const doctor_id = parseInt(localStorage.getItem("doctor_id"));
 
   useEffect(() => {
     const loadPatients = async () => {
       try {
-        const data = await getPatient(doctor_id); 
+        const data = await getPatient(doctor_id);
         setPatients(data || []);
       } catch (err) {
         console.error("Error fetching patients:", err);
@@ -20,13 +22,30 @@ const GivePrescription = () => {
     };
 
     loadPatients();
-  }, []);
+  }, [doctor_id]);
 
-  const handleAddPrescription = async (diseaseId) => {
+  const handleAddPrescription = async () => {
+    // Ensure patient and disease are selected
+    if (!selectedPatient || !selectedDisease) {
+      console.error("Patient or Disease not selected.");
+      return;
+    }
+
     try {
-      console.log(`Saving prescription for diseaseId: ${diseaseId}`, prescription);
+      console.log(
+        `Saving prescription for patientId: ${selectedPatient}, diseaseId: ${selectedDisease.id}`,
+        prescription
+      );
+
+      const response = await givePrescription(doctor_id, selectedPatient, prescription, selectedDisease.id);
+
+      // Reset states after prescription is saved
       setShowModal(false);
       setPrescription("");
+      setSelectedPatient(null);
+      setSelectedDisease(null);
+
+      console.log("Prescription saved successfully:", response);
     } catch (err) {
       console.error("Error adding prescription:", err);
     }
@@ -54,6 +73,7 @@ const GivePrescription = () => {
                       className="bg-blue-500 text-white px-3 py-1 rounded"
                       onClick={() => {
                         setSelectedDisease(disease);
+                        setSelectedPatient(patient.id); 
                         setShowModal(true);
                       }}
                     >
@@ -86,13 +106,15 @@ const GivePrescription = () => {
                   onClick={() => {
                     setShowModal(false);
                     setPrescription("");
+                    setSelectedPatient(null); 
+                    setSelectedDisease(null); // Reset states after cancel
                   }}
                 >
                   Cancel
                 </button>
                 <button
                   className="bg-blue-500 text-white px-4 py-2 rounded"
-                  onClick={() => handleAddPrescription(selectedDisease?.id)}
+                  onClick={handleAddPrescription} // Use the handleAddPrescription function to submit
                 >
                   Save
                 </button>

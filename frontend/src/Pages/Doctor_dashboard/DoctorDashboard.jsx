@@ -8,11 +8,11 @@ const DoctorDashboard = () => {
     completed:0,
     pending:0
   })
-
+  const doctor_id = localStorage.getItem('doctor_id')
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const data = await fetchStats(1);
+        const data = await fetchStats(doctor_id);
         setstats({
           completed:data.consultedPatients,
           pending:data.pendingConsults
