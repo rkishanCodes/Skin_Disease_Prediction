@@ -17,9 +17,20 @@ export const patient_register = async (req, res) => {
         gender,
       },
     });
-    res
-      .status(201)
-      .json({ message: "Patient registered successfully", patient });
+
+    // Generate a JWT token
+    const token = jwt.sign(
+      { id: patient.id, role: "patient" },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "7d" }
+    );
+
+    res.status(201).json({
+      message: "Patient registered successfully",
+      patient_id: patient.id,
+      patient_name: patient.username,
+      token,
+    });
   } catch (error) {
     res.status(400).json({ error: "Email already exists or invalid data" });
   }
@@ -41,7 +52,12 @@ export const patient_login = async (req, res) => {
       process.env.JWT_SECRET_KEY,
       { expiresIn: "7d" }
     );
-    res.json({ message: "Login successful", patient_id:patient.id,patient_name:patient.username ,token });
+    res.json({
+      message: "Login successful",
+      patient_id: patient.id,
+      patient_name: patient.username,
+      token,
+    });
   } catch (error) {
     res.status(500).json({ error: "An error occurred" });
   }
