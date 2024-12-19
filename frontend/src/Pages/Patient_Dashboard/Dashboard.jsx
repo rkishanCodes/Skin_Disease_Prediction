@@ -1,22 +1,71 @@
 import React from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
-import Navbar from "../../Components/Patient/Navbar";
-import CheckDisease from "../../components/Patient/CheckDisease"
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPrescriptions } from "../../store/actions";
+import Navbar from "../../Components/Patient/Navbar";
+import CheckDisease from "../../components/Patient/CheckDisease";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { Volume2, VolumeX, Download } from "lucide-react";
 
 const Dashboard = () => {
-const dispatch = useDispatch();
-const { prescriptions, loading } = useSelector((state) => state.dashboard);
-const [activeTab, setActiveTab] = React.useState("both");
-const patientId = localStorage.getItem("patient_id");
+  const dispatch = useDispatch();
+  const { prescriptions, loading } = useSelector((state) => state.dashboard);
+  const [activeTab, setActiveTab] = React.useState("both");
+  const [isSpeaking, setIsSpeaking] = React.useState(false);
+  const [currentUtterance, setCurrentUtterance] = React.useState(null);
+  const dashboardRef = React.useRef(null);
+  const patientId = localStorage.getItem("patient_id");
+  const prediction = useSelector((state) => state.dashboard.prediction);
 
-React.useEffect(() => {
-  dispatch(fetchPrescriptions(patientId));
-}, [dispatch, patientId]);
+  React.useEffect(() => {
+    dispatch(fetchPrescriptions(patientId));
+  }, [dispatch, patientId]);
 
-  
+  const speakText = (text) => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      setCurrentUtterance(null);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setCurrentUtterance(null);
+    };
+    setCurrentUtterance(utterance);
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const generatePDF = async () => {
+    if (!dashboardRef.current) return;
+
+    try {
+      const canvas = await html2canvas(dashboardRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      pdf.save("medical-dashboard.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
+  };
 
   const tabVariants = {
     inactive: { scale: 1 },
@@ -28,11 +77,7 @@ React.useEffect(() => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 200,
-        damping: 20,
-      },
+      transition: { type: "spring", stiffness: 200, damping: 20 },
     },
   };
 
@@ -40,8 +85,23 @@ React.useEffect(() => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Navbar />
 
-      {/* Modern Horizontal Navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+        ref={dashboardRef}
+      >
+        {/* Download PDF Button */}
+        <div className="flex justify-end mb-4">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={generatePDF}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors"
+          >
+            <Download size={20} />
+            Download PDF
+          </motion.button>
+        </div>
+
         <div className="flex justify-center space-x-4 mb-8">
           {["both", "checkDisease", "viewPrescription"].map((tab) => (
             <motion.button
@@ -67,7 +127,6 @@ React.useEffect(() => {
           ))}
         </div>
 
-        {/* Content Area */}
         <motion.div
           variants={contentVariants}
           initial="hidden"
@@ -82,9 +141,32 @@ React.useEffect(() => {
               transition={{ delay: 0.2 }}
             >
               <div className="p-6">
-                <h2 className="text-2xl font-bold mb-4 text-gray-800">
-                  Disease Checker
-                </h2>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    Disease Checker
+                  </h2>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => {
+                      // Get prediction from Redux store
+
+                      let textToSpeak = prediction
+                        ? `Analysis Results: The disease detected is ${
+                            prediction.details.name
+                          }. 
+         ${prediction.details.description}. 
+         Risk factors include: ${prediction.details.risk_factors.join(", ")}. 
+         Recommended action: ${prediction.details.recommended_action}`
+                        : "Welcome to Disease Checker. Please upload an image for analysis.";
+
+                      speakText(textToSpeak);
+                    }}
+                    className="p-2 rounded-full hover:bg-gray-100"
+                  >
+                    {isSpeaking ? <VolumeX size={24} /> : <Volume2 size={24} />}
+                  </motion.button>
+                </div>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <CheckDisease />
                 </div>
@@ -100,9 +182,32 @@ React.useEffect(() => {
               transition={{ delay: 0.3 }}
             >
               <div className="p-6">
-                <h2 className="text-2xl font-bold mb-4 text-gray-800">
-                  Prescriptions
-                </h2>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    Prescriptions
+                  </h2>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => {
+                      const prescriptionText =
+                        prescriptions.length > 0
+                          ? `You have ${
+                              prescriptions.length
+                            } prescriptions. ${prescriptions
+                              .map(
+                                (p) =>
+                                  `For ${p.disease.name}, you were prescribed ${p.prescription} by Dr. ${p.doctor.username}`
+                              )
+                              .join(". ")}`
+                          : "You have no prescriptions at this time.";
+                      speakText(prescriptionText);
+                    }}
+                    className="p-2 rounded-full hover:bg-gray-100"
+                  >
+                    {isSpeaking ? <VolumeX size={24} /> : <Volume2 size={24} />}
+                  </motion.button>
+                </div>
                 {loading ? (
                   <div className="flex justify-center items-center h-32">
                     <motion.div
