@@ -52,9 +52,9 @@ const GivePrescription = () => {
   };
 
   return (
-    <div className="flex w-full">
+    <div className="flex w-full bg-gray-100 h-screen">
       <Navbar />
-      <div className="w-[95vw] p-5">
+      <div className="w-[95vw] p-5 overflow-y-scroll">
         <h1 className="text-2xl font-bold mb-4">Your Patients</h1>
         {patients.map((patient) => (
           <div key={patient.id} className="bg-white shadow-md rounded p-4 mb-5">
@@ -70,7 +70,7 @@ const GivePrescription = () => {
                       <strong>{disease.name}:</strong> {disease.description}
                     </span>
                     <button
-                      className="bg-blue-500 text-white px-3 py-1 rounded"
+                      className="bg-lime-500 text-white px-3 py-1 rounded"
                       onClick={() => {
                         setSelectedDisease(disease);
                         setSelectedPatient(patient.id); 
@@ -107,14 +107,14 @@ const GivePrescription = () => {
                     setShowModal(false);
                     setPrescription("");
                     setSelectedPatient(null); 
-                    setSelectedDisease(null); // Reset states after cancel
+                    setSelectedDisease(null); 
                   }}
                 >
                   Cancel
                 </button>
                 <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                  onClick={handleAddPrescription} // Use the handleAddPrescription function to submit
+                  className="bg-lime-500 text-white px-4 py-2 rounded"
+                  onClick={handleAddPrescription} 
                 >
                   Save
                 </button>

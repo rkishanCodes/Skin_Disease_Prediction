@@ -231,10 +231,10 @@ const Dashboard = () => {
                         className="bg-gray-50 p-4 rounded-lg hover:shadow-md transition-shadow duration-300"
                       >
                         <h3 className="text-xl font-semibold text-blue-600">
-                          {prescription.disease.name}
+                          {prescription.disease?.name}
                         </h3>
                         <p className="text-gray-600 mt-2">
-                          {prescription.disease.description}
+                          {prescription.disease?.description}
                         </p>
                         <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
                           <p className="font-medium text-gray-800">
