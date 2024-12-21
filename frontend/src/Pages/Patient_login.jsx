@@ -271,7 +271,7 @@ const CombinedLogin = () => {
           Don't have an account?{" "}
           <motion.span whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
-              to={role === "patient" ? "/register" : "/"}
+              to={role === "patient" ? "/register" : "/doctor/register"}
               className="text-blue-500 underline hover:text-blue-700 transition-colors"
             >
               Register

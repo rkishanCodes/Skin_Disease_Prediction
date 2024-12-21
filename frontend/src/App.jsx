@@ -17,7 +17,7 @@ const App = () => {
         <Route path="/" element={<Patient_login/>}/>
         <Route path="/register" element={<Patient_register/>}/>
         {/* <Route path="/doctor/login" element={<Doctor_login/>}/> */}
-        {/* <Route path="/doctor/register" element={<Doctor_register/>}/> */}
+        <Route path="/doctor/register" element={<Doctor_register/>}/>
           {
             Patient_token && (
               <>

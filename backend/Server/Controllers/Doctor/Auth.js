@@ -14,7 +14,8 @@ export const register = async(req,res) =>{
             username
           },
         });
-        res.status(201).json({ message: 'Doctor registered successfully', doctor });
+        const token = jwt.sign({id:doctor.id},process.env.JWT_SECRET_KEY,{expiresIn: "1h"})
+        res.json({ message: 'Doctor logged in successfully',doctor_username:doctor.username, token,doctor_id:doctor.id});
       } catch (error) {
         res.status(400).json({ error: 'Email already exists or invalid data' });
       }
