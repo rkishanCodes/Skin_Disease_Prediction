@@ -3,6 +3,7 @@ import Navbar from "../../Components/Doctor/Navbar";
 import Box_comp from "../../Components/Doctor/Box_comp";
 import fetchStats from "../../Utils/Fetchstats";
 import Graph from "../../Components/Doctor/Graph";
+import Stats_graph from "../../Components/Doctor/Stats_graph";
 
 const DoctorDashboard = () => {
   const [stats, setstats] = useState({
@@ -54,8 +55,12 @@ const DoctorDashboard = () => {
           />
         </div>
         <div>
+          <Stats_graph/>
+        </div>
+        <div>
           <Graph />
         </div>
+        
       </div>
     </div>
   );
